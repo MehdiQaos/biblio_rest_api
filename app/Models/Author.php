@@ -12,4 +12,12 @@ class Author extends Model
     public function books() {
         return $this->hasMany(Book::class);
     }
+
+    public static function createAuthor($authorName) {
+        $author = Author::where('name', $authorName)->first();
+        if (is_null($author)) {
+            $author = Author::create(['name' => $authorName]);
+        }
+        return $author;
+    }
 }

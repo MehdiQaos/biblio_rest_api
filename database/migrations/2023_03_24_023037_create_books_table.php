@@ -22,7 +22,7 @@ return new class extends Migration
             $table->longText('description');
             $table->date('release_date');
             $table->foreignId('author_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('genre_id')->constrained()->nullOnDelete();
+            $table->foreignId('genre_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('collection_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('emplacement_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();

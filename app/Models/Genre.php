@@ -12,4 +12,12 @@ class Genre extends Model
     public function books() {
         return $this->hasMany(Book::class);
     }
+
+    public static function createGenre($genreName) {
+        $genre = Genre::where('name', $genreName)->first();
+        if (is_null($genre)) {
+            $genre = Genre::create(['name' => $genreName]);
+        }
+        return $genre;
+    }
 }

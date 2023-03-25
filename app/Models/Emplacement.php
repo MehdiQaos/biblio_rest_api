@@ -12,4 +12,11 @@ class Emplacement extends Model
     public function book() {
         return $this->hasOne(Book::class);
     }
+
+    public static function getNewEmplacement() {
+        $emplacement = self::where('empty', true)->first();
+        $emplacement->empty = false;
+        $emplacement->save();
+        return $emplacement;
+    }
 }
