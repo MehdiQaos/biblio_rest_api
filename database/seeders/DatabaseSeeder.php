@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             EmplacementSeeder::class,
-            // GenreSeeder::class,
+            GenreSeeder::class,
             BookSeeder::class,
             CollectionSeeder::class,
         ]);

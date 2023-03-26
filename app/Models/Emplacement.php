@@ -9,6 +9,10 @@ class Emplacement extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'empty',
+    ];
+
     public function book() {
         return $this->hasOne(Book::class);
     }
