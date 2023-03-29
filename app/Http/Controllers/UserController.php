@@ -8,6 +8,7 @@ use App\Http\Resources\Users\UserCollection;
 use App\Http\Resources\Users\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -15,6 +16,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->middleware('role:admin')->except('show', 'update', 'updatePassword');
     }
 
     /**
@@ -55,10 +57,16 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $user = User::find($id);
+        if (!auth()->user()->hasRole('admin') && auth()->user()->id !== $id) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'You are not authorized to access this resource',
+            ], 403);
+        }
 
+        $user = User::find($id);
         if (is_null($user)) {
             return response()->json([
                 'status' => 'fail',
@@ -81,6 +89,13 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id)
     {
+        if (!auth()->user()->hasRole('admin') && auth()->user()->id !== $id) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'You are not authorized to access this resource',
+            ], 403);
+        }
+
         $user = User::find($id);
 
         if (is_null($user))
@@ -100,6 +115,13 @@ class UserController extends Controller
 
     public function updatePassword(Request $request, $id)
     {
+        if (!auth()->user()->hasRole('admin') && auth()->user()->id !== $id) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'You are not authorized to access this resource',
+            ], 403);
+        }
+
         $request->validate([
             'currentPassword' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', 'min:8'],
@@ -113,11 +135,6 @@ class UserController extends Controller
                 'message' => 'User not found',
             ], 404);
         }
-        
-        // return response()->json([
-        //     'password' => $request->password,
-        //     // 'hashed' => Hash::make($request->password),
-        // ], 200);
         
         $user->update([
             'password' => Hash::make($request->password),

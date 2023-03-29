@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\Books\BookCollection;
 use App\Http\Resources\Books\BookResource;
+use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
@@ -14,6 +15,7 @@ class BookController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->middleware('role:admin|receptionist')->except('index', 'show');
     }
 
     /**
@@ -21,9 +23,18 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::all();
+        $books = null;
+        if($request->has('genre')){
+            $books = Book::whereHas('genre', function ($query) use ($request) {
+                $query->where('name', $request->genre);
+            })->get();
+        }else{
+            $books = Book::all();
+        }
+
+        // $books = Book::all();
 
         return response()->json([
             'status' => 'success',
