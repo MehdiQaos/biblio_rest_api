@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Collection;
 use App\Http\Requests\StoreCollectionRequest;
 use App\Http\Requests\UpdateCollectionRequest;
+use App\Http\Resources\Collections\CollectionCollection;
+use App\Http\Resources\Collections\CollectionResource;
 
 class CollectionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,17 +22,12 @@ class CollectionController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $collections = Collection::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response()->json([
+            'status' => 'success',
+            'collections' => new CollectionCollection($collections),
+        ]);
     }
 
     /**
@@ -36,7 +38,13 @@ class CollectionController extends Controller
      */
     public function store(StoreCollectionRequest $request)
     {
-        //
+        $collection = Collection::create($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Collection created successfully',
+            'collection' => new CollectionResource($collection),
+        ]);
     }
 
     /**
@@ -45,20 +53,21 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\Response
      */
-    public function show(Collection $collection)
+    public function show($id)
     {
-        //
-    }
+        $collection = Collection::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Collection $collection)
-    {
-        //
+        if (is_null($collection)) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Collection not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'succes',
+            'collection' => new CollectionResource($collection),
+        ], 200);
     }
 
     /**
@@ -68,9 +77,23 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCollectionRequest $request, Collection $collection)
+    public function update(UpdateCollectionRequest $request, $id)
     {
-        //
+        $collection = Collection::find($id);
+
+        if (is_null($collection))
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Collection not found',
+            ], 404);
+
+        $collection->update($request->all());
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Collection updated successfully',
+            'collection' => new CollectionResource($collection),
+        ], 200);
     }
 
     /**
@@ -79,8 +102,22 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Collection $collection)
+    public function destroy($id)
     {
-        //
+        $collection = Collection::find($id);
+
+        if (is_null($collection))
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'collection not found',
+            ], 404);
+
+        $collection->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'collection deleted successfully',
+            'collection' => new CollectionResource($collection),
+        ], 200);
     }
 }

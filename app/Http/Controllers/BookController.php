@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use App\Http\Resources\Books\BookCollection;
+use App\Http\Resources\Books\BookResource;
 
 class BookController extends Controller
 {
@@ -25,7 +27,7 @@ class BookController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'books' => $books,
+            'books' => new BookCollection($books),
         ]);
     }
 
@@ -42,7 +44,7 @@ class BookController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Book created successfully',
-            'book' => $book,
+            'book' => new BookResource($book),
         ]);
     }
 
@@ -59,13 +61,13 @@ class BookController extends Controller
         if (is_null($book)) {
             return response()->json([
                 'status' => 'fail',
-                'message' => 'Category not found'
+                'message' => 'Book not found'
             ], 404);
         }
 
         return response()->json([
             'status' => 'succes',
-            'category' => $book,
+            'book' => new BookResource($book),
         ], 200);
     }
 
@@ -91,7 +93,7 @@ class BookController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Book updated successfully',
-            'category' => $book,
+            'book' => new BookResource($book),
         ], 200);
     }
 
@@ -108,15 +110,15 @@ class BookController extends Controller
         if (is_null($book))
             return response()->json([
                 'status' => 'fail',
-                'message' => 'Category not found',
+                'message' => 'book not found',
             ], 404);
 
         $book->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Category deleted successfully',
-            'category' => $book,
+            'message' => 'book deleted successfully',
+            'book' => new BookResource($book),
         ], 200);
 
     }

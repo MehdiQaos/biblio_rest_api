@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Genre;
-use App\Http\Requests\StoreGenreRequest;
-use App\Http\Requests\UpdateGenreRequest;
-use App\Http\Resources\Genres\GenreCollection;
-use App\Http\Resources\Genres\GenreResource;
+use App\Http\Resources\Author\AuthorCollection;
+use App\Http\Resources\Author\AuthorResource;
+use App\Models\Author;
+use Illuminate\Http\Request;
 
-class GenreController extends Controller
+class AuthorController extends Controller
 {
     public function __construct()
     {
@@ -22,102 +21,110 @@ class GenreController extends Controller
      */
     public function index()
     {
-        $genres = Genre::all();
+        $authors = Author::all();
 
         return response()->json([
             'status' => 'success',
-            'genres' => new GenreCollection($genres),
+            'authors' => new AuthorCollection($authors),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreGenreRequest  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreGenreRequest $request)
+    public function store(Request $request)
     {
-        $genre = Genre::create($request->all());
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:authors,name,'],
+        ]);
+
+        $author = Author::create($request->all());
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Collection created successfully',
-            'genre' => new GenreResource($genre),
+            'message' => 'Author created successfully',
+            'genre' => new AuthorResource($author),
         ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Genre  $genre
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $genre = Genre::find($id);
+        $author = Author::find($id);
 
-        if (is_null($genre)) {
+        if (is_null($author)) {
             return response()->json([
                 'status' => 'fail',
-                'message' => 'Genre not found'
+                'message' => 'Author not found'
             ], 404);
         }
 
         return response()->json([
             'status' => 'succes',
-            'genre' => new GenreResource($genre),
+            'author' => new AuthorResource($author),
         ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateGenreRequest  $request
-     * @param  \App\Models\Genre  $genre
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateGenreRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $genre = Genre::find($id);
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:authors,name,' . $id],
+        ]);
 
-        if (is_null($genre))
+        $author = Author::find($id);
+
+        if (is_null($author))
             return response()->json([
                 'status' => 'fail',
-                'message' => 'genre not found',
+                'message' => 'author not found',
             ], 404);
 
-        $genre->update($request->all());
+        $author->update($request->all());
         
         return response()->json([
             'status' => 'success',
-            'message' => 'genre updated successfully',
-            'genre' => new GenreResource($genre),
+            'message' => 'author updated successfully',
+            'author' => new AuthorResource($author),
         ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Genre  $genre
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $genre = Genre::find($id);
+        $author = Author::find($id);
 
-        if (is_null($genre))
+        if (is_null($author))
             return response()->json([
                 'status' => 'fail',
-                'message' => 'genre not found',
+                'message' => 'author not found',
             ], 404);
 
-        $genre->delete();
+        $author->delete();
 
         return response()->json([
             'status' => 'success',
             'message' => 'genre deleted successfully',
-            'genre' => new GenreResource($genre),
+            'genre' => new AuthorResource($author),
         ], 200);
     }
 }

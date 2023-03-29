@@ -23,8 +23,34 @@ class UpdateBookRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        $method = $this->getMethod();
+
+        if ($method == 'PUT') {
+            return [
+                'title' => ['required', 'string', 'max:255'],
+                'author_id' => ['required', 'integer'],
+                'genre_id' => ['required', 'integer'],
+                'isbn' => ['required', 'string', 'max:17'],
+                'pages' => ['required', 'integer'],
+                'release_date' => ['required', 'date'],
+                'description' => ['required', 'string'],
+                'collection_id' => ['nullable', 'integer'],
+                'emplacement_id' => ['nullable', 'integer'],
+                'status' => ['required', 'string', 'in:available,unavailable'],
+            ];
+        } else {
+            return [
+                'title' => ['sometimes', 'required', 'string', 'max:255'],
+                'author_id' => ['sometimes', 'required', 'integer'],
+                'genre_id' => ['sometimes', 'required', 'integer'],
+                'isbn' => ['sometimes', 'required', 'string', 'max:17'],
+                'pages' => ['sometimes', 'required', 'integer'],
+                'release_date' => ['sometimes', 'required', 'date'],
+                'description' => ['sometimes', 'required', 'string'],
+                'collection_id' => ['sometimes', 'nullable', 'integer'],
+                'emplacement_id' => ['sometimes', 'nullable', 'integer'],
+                'status' => ['sometimes', 'required', 'string', 'in:available,unavailable'],
+            ];
+        }
     }
 }

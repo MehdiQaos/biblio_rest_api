@@ -24,10 +24,10 @@ class StoreBookRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255', 'unique:books'],
             'author_id' => ['required', 'integer'],
             'genre_id' => ['required', 'integer'],
-            'isbn' => ['required', 'string', 'max:17'],
+            'isbn' => ['required', 'string', 'size:17', 'unique:books'],
             'pages' => ['required', 'integer'],
             'release_date' => ['required', 'date'],
             'description' => ['required', 'string'],
